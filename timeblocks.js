@@ -6,7 +6,7 @@ function generateTimeBlocks() {
 
     // Create a Date objects for 8 and 4 PM
     const startTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 9, 0, 0);
-    const endTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 20, 0, 0);
+    const endTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 17, 0, 0);
 
 
     // Extract the hour from startTime and format it
