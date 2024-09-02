@@ -1,45 +1,29 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Time Block Visualizer</title>
-    <style>
-        #time-blocks {
-            font-family: monospace;
-            white-space: pre-wrap;
-
-            /* New styles */
-            /* font-weight: bold; */
-            /* Make the text bold */
-            background-color: lightblue;
-            /* Add a light blue background color */
-            font-size: 14px;
-            /* Adjust the font size as needed */
-
-            display: flex;
-            /* Use flexbox for easy centering */
-            justify-content: center;
-            /* Center horizontally */
-            align-items: center;
-            /* Center vertically (if needed) */
-        }
-    </style>
+    <link rel="stylesheet" href="styles.css">
 </head>
-
 <body>
-    <div id="time-blocks"></div>
+    <main id="time-blocks">
+        <header>
+            <span id="date"></span>
+            <span id="time-info"></span>
+        </header>
+        <div id="chart-container">
+            <div id="blocks"></div>
+            <div id="block-labels">
+                <span>4hr</span>
+                <span>1hr</span>
+                <span>3hr</span>
+            </div>
+        </div>
+        <div>Total blocks: 16</div>
+        <div id="remaining-blocks"></div>
+        <div id="passed-blocks"></div>
+    </main>
     <script src="timeblocks.js"></script>
-    <script>
-        // Update the time blocks initially and every minute
-        function updateTimeBlocks() {
-            document.getElementById('time-blocks').textContent = generateTimeBlocks();
-            // Gets the time block output from generateTimeBlocks() and sets it as the content of the #time-blocks div
-        }
-
-        updateTimeBlocks();   // Call the function immediately to display the initial time blocks
-        setInterval(updateTimeBlocks, 60000);  // Call the function every 60000 milliseconds (1 minute) to update the display
-    </script>
 </body>
-
 </html>

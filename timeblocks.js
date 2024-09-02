@@ -1,58 +1,59 @@
+const DAYS_OF_WEEK = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
+const START_HOUR = 9;  // 9 AM
+const END_HOUR = 17;   // 5 PM
+const TOTAL_BLOCKS = 16;
+
 function generateTimeBlocks() {
-    // 1. Get the current time and set up start/end times for the day
-    const now = new Date(); // Get the current date and time
-    const currentTime = new Date(now).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', timeZone: "America/Los_Angeles" });
-    // Format the current time as HH:MM in PST timezone
-
-    // Create a Date objects for 8 and 4 PM
-    const startTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 9, 0, 0);
-    const endTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 17, 0, 0);
-
-
-    // Extract the hour from startTime and format it
-    const startHour = startTime.getHours();
-    const startHourFormatted = startHour % 12 || 12; // Convert to 12-hour format
-    const startAmPm = startHour < 12 ? 'AM' : 'PM';
-
-    // Extract the hour from endTime and format it
-    const endHour = endTime.getHours();
-    const endHourFormatted = endHour % 12 || 12; // Convert to 12-hour format
-    const endAmPm = endHour < 12 ? 'AM' : 'PM';
-
-
-    // 2. Calculate total, elapsed, and remaining time in minutes
-    const totalMinutes = (endTime - startTime) / (1000 * 60);
-    // Calculate the total duration of the workday in minutes
-
-    const elapsedMinutes = Math.max(0, (new Date(now) - startTime) / (1000 * 60));
-    // Calculate how many minutes have passed since the start of the workday
-
-    const remainingMinutes = Math.max(0, totalMinutes - elapsedMinutes);
-    // Calculate how many minutes are remaining in the workday
-
-    // 3. Calculate the number of filled and remaining blocks
-    const totalBlocks = 16; // Total number of blocks representing the workday
-
-    const filledBlocks = Math.min(totalBlocks, Math.floor((elapsedMinutes / totalMinutes) * totalBlocks));
-    // Calculate how many blocks should be filled based on the elapsed time
-
-    // 4. Create an array to represent the blocks visually
-    const blocks = Array(totalBlocks).fill(0).map((_, i) => i < filledBlocks ? '⣀' : '⣿');
-    // Create an array of 16 elements, filling it with '⣀' for filled blocks and '⣿' for remaining blocks
-
-    // 5. Group the blocks for visual representation
-    const firstGroup = blocks.slice(0, 8).join(''); // First 8 blocks
-    const secondGroup = blocks.slice(8, 10).join(''); // Next 2 blocks
-    const thirdGroup = blocks.slice(10).join(''); // Last 6 blocks
-
-    // 6. Return the formatted output string
-    return `
-    ${startHourFormatted} ${startAmPm} - ${endHourFormatted} ${endAmPm}   (PST: ${currentTime})
+    const now = new Date();
+    const formattedDate = `${DAYS_OF_WEEK[now.getDay()]} ${now.toLocaleString('default', { month: 'short' })} ${now.getDate()}`;
+    const currentTime = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', timeZone: "America/Los_Angeles" });
     
-    | ${firstGroup} | ${secondGroup} | ${thirdGroup} |
-         4hr      1hr     3hr
-      `;
-    // Total blocks: 16
-    // Remaining: ${blocks.filter(b => b === '⣿').length}
-    // Passed: ${blocks.filter(b => b === '⣀').length}
+    // Set the start and end times for today
+    const startTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), START_HOUR, 0, 0);
+    const endTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), END_HOUR, 0, 0);
+
+    const totalMinutes = (endTime - startTime) / 60000;
+    const elapsedMinutes = Math.max(0, (now - startTime) / 60000);
+    const filledBlocks = Math.min(TOTAL_BLOCKS, Math.floor((elapsedMinutes / totalMinutes) * TOTAL_BLOCKS));
+
+    const blocks = Array(TOTAL_BLOCKS).fill('⣿').fill('⣀', 0, filledBlocks);
+
+    return {
+        formattedDate,
+        currentTime,
+        blocks,
+        remainingBlocks: TOTAL_BLOCKS - filledBlocks,
+        passedBlocks: filledBlocks,
+        startHourFormatted: START_HOUR % 12 || 12,
+        startAmPm: START_HOUR < 12 ? 'AM' : 'PM',
+        endHourFormatted: END_HOUR % 12 || 12,
+        endAmPm: END_HOUR > 12 ? 'PM' : 'AM'  
+    };
 }
+
+function updateTimeBlocks() {
+    const {
+        formattedDate,
+        currentTime,
+        blocks,
+        remainingBlocks,
+        passedBlocks,
+        startHourFormatted,
+        startAmPm,
+        endHourFormatted,
+        endAmPm
+    } = generateTimeBlocks();
+
+    document.getElementById('date').textContent = formattedDate;
+    document.getElementById('time-info').textContent = `| PST: ${currentTime} | (${startHourFormatted} ${startAmPm} - ${endHourFormatted} ${endAmPm})`;
+    
+    const formattedBlocks = `|${blocks.slice(0, 8).join('')} | ${blocks.slice(8, 10).join('')} | ${blocks.slice(10).join('')}|`;
+    document.getElementById('blocks').textContent = formattedBlocks;
+    
+    // document.getElementById('remaining-blocks').textContent = `Remaining: ${remainingBlocks}`;
+    // document.getElementById('passed-blocks').textContent = `Passed: ${passedBlocks}`;
+
+    requestAnimationFrame(() => setTimeout(updateTimeBlocks, 60000));
+}
+
+updateTimeBlocks();
